@@ -47,22 +47,51 @@ const getInitiativeDB = async (data) => {
 
         init.fields.forEach(field => {
             
-            let fi = getAccessKeysFromNode(getClassName(field.property));
-            let obj = new constructors[getClassName(field.property)]();
+            // let fi = getAccessKeysFromNode(getClassName(field.property));
 
-            for (const [key, value] of Object.entries(user)) {
-                if(key == field.property){
-                    user[key] = new constructors[getClassName(key)]();
-                    for (const [key, value] of Object.entries(obj)) {
-                        if(field.access_key.includes(key)){
-                            obj[key] = true;
-                        }else{
-                            obj[key] = false;
+            if(field.property.includes('.')){
+                let obj1 = new constructors[getClassName(field.property.split('.')[0])]();
+                let obj2 = new constructors[getClassName(field.property.split('.')[1])]();
+
+                for (const [key, value] of Object.entries(user)) {
+                    if(key == field.property.split('.')[0]){
+
+                        user[key] = new constructors[getClassName(key)]();
+                        user[key][field.property.split('.')[1]] = new constructors[getClassName(field.property.split('.')[1])]();
+                        for (const [key1, value1] of Object.entries(obj2)) {
+                            for (const [key2, value2] of Object.entries(obj1)) {
+                                obj1[key2] = false;
+                            }
+                            if(field.access_key.includes(key1)){
+                                obj2[key1] = true;
+                            }else{
+                                obj2[key1] = false;
+                            }
                         }
+                        user[field.property.split('.')[0]] = obj1;
+                        console.log(user);
+                        console.log(user[field.property.split('.')[0]]);
+                        user[key][field.property.split('.')[1]] = obj2;
                     }
-                    user[field.property] = obj;
+                }
+            }else{
+                let obj = new constructors[getClassName(field.property)]();
+
+                for (const [key, value] of Object.entries(user)) {
+                    if(key == field.property){
+                        user[key] = new constructors[getClassName(key)]();
+                        for (const [key, value] of Object.entries(obj)) {
+                            if(field.access_key.includes(key)){
+                                obj[key] = true;
+                            }else{
+                                obj[key] = false;
+                            }
+                        }
+                        user[field.property] = obj;
+                    }
                 }
             }
+            
         });
         initiative.fields.push(user)
         return initiative;
@@ -81,20 +110,43 @@ const saveInitiativeDB = async (data) => {
         if (initiativeExists(data.initiative.initiative)) {
             init.initiative = data.initiative.initiative;
             for (i = 0; i <= data.initiative.fields.length - 1; i++) {
-                let nodeName = getClassName(data.initiative.fields[i].property);
 
-                if (!data.initiative.fields[i].access_key) {
-                    for (const [key, value] of Object.entries(new User())) {
-                        if (key === data.initiative.fields[i].property) {
-                            init.fields.push(new Field(data.initiative.fields[i].property, getAccessKeysFromNode(nodeName)));
+                if(data.initiative.fields[i].property.includes('.')){
+                    let nodeName = getClassName(data.initiative.fields[i].property.split('.')[1]);
+
+                    let obj1 = new constructors[getClassName(data.initiative.fields[i].property.split('.')[0])]();
+                    let obj2 = new constructors[getClassName(data.initiative.fields[i].property.split('.')[1])]();
+
+                    if (!data.initiative.fields[i].access_key) {
+                        for (const [key, value] of Object.entries(new User())) {
+                            if (key === data.initiative.fields[i].property.split('.')[0]) {
+                                // init.fields.push(new Field(data.initiative.fields[i].property.split('.')[0], getAccessKeysFromNode(nodeName)));
+                                init.fields.push(new Field(data.initiative.fields[i].property, getAccessKeysFromNode(nodeName)));
+                            }
+                        }
+                    } else {
+                        let validatedNodeAKs = validateAccessKeysFromNode(data.initiative.fields[i].access_key, nodeName);
+                        if (validatedNodeAKs) {
+                            init.fields.push(new Field(data.initiative.fields[i].property.split('.')[0], validatedNodeAKs));
                         }
                     }
-                } else {
-                    let validatedNodeAKs = validateAccessKeysFromNode(data.initiative.fields[i].access_key, nodeName);
-                    if (validatedNodeAKs) {
-                        init.fields.push(new Field(data.initiative.fields[i].property, validatedNodeAKs));
+                }else{
+                    let nodeName = getClassName(data.initiative.fields[i].property);
+                    if (!data.initiative.fields[i].access_key) {
+                        for (const [key, value] of Object.entries(new User())) {
+                            if (key === data.initiative.fields[i].property) {
+                                init.fields.push(new Field(data.initiative.fields[i].property, getAccessKeysFromNode(nodeName)));
+                            }
+                        }
+                    } else {
+                        let validatedNodeAKs = validateAccessKeysFromNode(data.initiative.fields[i].access_key, nodeName);
+                        if (validatedNodeAKs) {
+                            init.fields.push(new Field(data.initiative.fields[i].property, validatedNodeAKs));
+                        }
                     }
                 }
+
+
             }
             initiativeData.push(init);
         }
