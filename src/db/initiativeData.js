@@ -5,8 +5,6 @@ class Field {
         this.property = prop;
         this.access_key = ak;
     }
-    property;
-    access_key;
 }
 
 class Initiative {
@@ -14,8 +12,6 @@ class Initiative {
         this.initiative = initiative;
         this.fields = fields;
     }
-    initiative;
-    fields;
 }
 
 const initiativeData = [];
