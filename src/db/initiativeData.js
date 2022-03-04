@@ -36,28 +36,29 @@ const getInitiativeDB = async (data) => {
         initiative.initiative = data.initiative;
         initiative.fields = [];
         let user = new User();
+        
+        for (const [key, value] of Object.entries(user)) {
+            let obj = new constructors[getClassName(key)]();
+            for (const [key, value] of Object.entries(obj)) {
+                obj[key] = false;
+            }
+            user[key] = obj;
+        }
+
         init.fields.forEach(field => {
             
             let fi = getAccessKeysFromNode(getClassName(field.property));
             let obj = new constructors[getClassName(field.property)]();
-            
+
             for (const [key, value] of Object.entries(user)) {
-                user[key] = new constructors[getClassName(key)]();
                 if(key == field.property){
+                    user[key] = new constructors[getClassName(key)]();
                     for (const [key, value] of Object.entries(obj)) {
                         if(field.access_key.includes(key)){
                             obj[key] = true;
-                        }else{
-                            obj[key] = false;
                         }
                     }
                     user[field.property] = obj;
-                }else{
-                    let obj = new constructors[getClassName(key)]();
-                    for (const [key, value] of Object.entries(obj)) {
-                        obj[key] = false;
-                    }
-                    user[key] = obj;
                 }
             }
         });

@@ -51,7 +51,7 @@ query {
 mutation {
     createInitiative(initiative:{
                         initiative: "risk", 
-                        fields: [{ property: "general_info" },{ property: "comercial_info", access_key:"asdf" }]
+                        fields: [{ property: "general_info" },{ property: "comercial_info", access_key:"term_and_conditions" }]
     })
     {
         initiative,
