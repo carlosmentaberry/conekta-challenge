@@ -54,7 +54,7 @@ module.exports = schema = buildSchema(`
         getUsers : [User]
         getUser(name:String) : User
 
-        getInitiatives: [InitiativeOutPut]
+        getInitiatives: [Initiative]
         getInitiative(initiative:String) : InitiativeOutPut
     }
 
