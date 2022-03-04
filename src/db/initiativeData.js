@@ -60,8 +60,8 @@ const getInitiativeDB = async (data) => {
                     user[key] = obj;
                 }
             }
-            initiative.fields.push(user)
         });
+        initiative.fields.push(user)
         return initiative;
     }
 
