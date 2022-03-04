@@ -44,13 +44,18 @@ module.exports = schema = buildSchema(`
         initiative: String,
         fields: [Field]
     }
+
+    type InitiativeOutPut {
+        initiative: String,
+        fields: [User]
+    }
     
     type Query {
         getUsers : [User]
         getUser(name:String) : User
 
-        getInitiatives: [Initiative]
-        getInitiative(name:String) : Initiative
+        getInitiatives: [InitiativeOutPut]
+        getInitiative(initiative:String) : InitiativeOutPut
     }
 
     type Mutation {

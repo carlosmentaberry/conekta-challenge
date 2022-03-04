@@ -30,7 +30,41 @@ const initiativeData = [];
 
 
 const getInitiativeDB = async (data) => {
-    return initiativeData.filter(x => x.initiative == data.name)[0];
+    let init = initiativeData.filter(x => x.initiative == data.initiative)[0];
+    if(init){
+        let initiative = new Initiative();
+        initiative.initiative = data.initiative;
+        initiative.fields = [];
+        init.fields.forEach(field => {
+            
+            let fi = getAccessKeysFromNode(getClassName(field.property));
+            let obj = new constructors[getClassName(field.property)]();
+            let user = new User();
+            
+            for (const [key, value] of Object.entries(user)) {
+                user[key] = new constructors[getClassName(key)]();
+                if(key == field.property){
+                    for (const [key, value] of Object.entries(obj)) {
+                        if(field.access_key.includes(key)){
+                            obj[key] = true;
+                        }else{
+                            obj[key] = false;
+                        }
+                    }
+                    user[field.property] = obj;
+                }else{
+                    let obj = new constructors[getClassName(key)]();
+                    for (const [key, value] of Object.entries(obj)) {
+                        obj[key] = false;
+                    }
+                    user[key] = obj;
+                }
+            }
+            initiative.fields.push(user)
+        });
+        return initiative;
+    }
+
 }
 
 const getInitiativesDB = async () => {
@@ -70,7 +104,7 @@ const initiativeExists = (initiative) => {
 }
 
 const getAccessKeysFromNode = (classname) => {
-    var obj = new constructors[classname]();
+    let obj = new constructors[classname]();
     let keys = '';
     for (const [key1, value1] of Object.entries(obj)) {
         keys += key1 + ',';

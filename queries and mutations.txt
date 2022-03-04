@@ -1,0 +1,63 @@
+query {
+  getUsers {
+    general_info {
+      name
+    }
+  }
+}
+
+query {
+  getInitiatives {
+    initiative,
+    fields {
+        property,
+        access_key
+    }
+  }
+}
+
+query {
+  getInitiative(initiative:"risk") {
+    initiative,
+    fields {
+        general_info{
+            name, 
+            last_name,
+            birthdate,
+            email
+        },
+        comercial_info{
+            company_name,
+            term_and_conditions,
+            send_products,
+            web
+       },
+       fiscal_info{
+            rfc,
+            activity,
+            company_name,
+            address{
+                street,
+                number,
+                city,
+                zip_code
+            }
+        },
+    }
+  }
+}
+
+
+mutation {
+    createInitiative(initiative:{
+                        initiative: "risk", 
+                        fields: [{ property: "general_info" },{ property: "comercial_info", access_key:"asdf" }]
+    })
+    {
+        initiative,
+        fields {
+            property,
+            access_key,
+        }
+    }
+}
