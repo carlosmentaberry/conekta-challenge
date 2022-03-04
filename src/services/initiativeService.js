@@ -9,8 +9,7 @@ const getInitiatives = async () => {
 }
 
 const createInitiative = async (data) => {
-    await saveInitiativeDB(data);
-    return data;
+    return await saveInitiativeDB(data);
 }
 
 const updateInitiative = async (data) => {

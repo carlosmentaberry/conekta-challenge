@@ -13,12 +13,10 @@ module.exports = root = {
         return saveUserDB(data);
     },
     updateUser: (data) => {
-        updateUserDB(data);
-        return data;
+        return updateUserDB(data);
     },
     deleteUser: (data) => {
-        deleteUserDB(data);
-        return data;
+        return deleteUserDB(data);
     },
     
     getInitiatives: () => {
@@ -29,15 +27,12 @@ module.exports = root = {
         return getInitiativeDB(data);
     },
     createInitiative: (data) => {
-        saveInitiativeDB(data);
-        return data;
+        return saveInitiativeDB(data);
     },
     updateInitiative: (data) => {
-        updateInitiativeDB(data);
-        return data;
+        return updateInitiativeDB(data);
     },
     deleteInitiative: (data) => {
-        deleteInitiativeDB(data);
-        return data;
+        return deleteInitiativeDB(data);
     },
 }

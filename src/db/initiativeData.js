@@ -1,18 +1,7 @@
-const { User, General_info, Comercial_info, Fiscal_info, Address } = require("../db/userData");
+const { User, General_info, Comercial_info, Fiscal_info, Address } = require("../models/user");
+const { Initiative, Field } = require("../models/initiative");
 
-class Field {
-    constructor(prop, ak) {
-        this.property = prop;
-        this.access_key = ak;
-    }
-}
 
-class Initiative {
-    constructor(initiative, fields) {
-        this.initiative = initiative;
-        this.fields = fields;
-    }
-}
 
 const initiativeData = [];
 //     {
@@ -52,29 +41,32 @@ const saveInitiativeDB = async (data) => {
     let init = new Initiative("", []);
 
     if (data.initiative) {
-        init.initiative = data.initiative.initiative;
-        for (i = 0; i <= data.initiative.fields.length - 1; i++) {
-            let nodeName = getClassName(data.initiative.fields[i].property);
+        if (initiativeExists(data.initiative.initiative)) {
+            init.initiative = data.initiative.initiative;
+            for (i = 0; i <= data.initiative.fields.length - 1; i++) {
+                let nodeName = getClassName(data.initiative.fields[i].property);
 
-            if (!data.initiative.fields[i].access_key) {
-                for (const [key, value] of Object.entries(new User())) {
-                    if (key === data.initiative.fields[i].property) {
-                        init.fields.push(new Field(data.initiative.fields[i].property, getAccessKeysFromNode(nodeName)));
+                if (!data.initiative.fields[i].access_key) {
+                    for (const [key, value] of Object.entries(new User())) {
+                        if (key === data.initiative.fields[i].property) {
+                            init.fields.push(new Field(data.initiative.fields[i].property, getAccessKeysFromNode(nodeName)));
+                        }
+                    }
+                } else {
+                    let validatedNodeAKs = validateAccessKeysFromNode(data.initiative.fields[i].access_key, nodeName);
+                    if (validatedNodeAKs) {
+                        init.fields.push(new Field(data.initiative.fields[i].property, validatedNodeAKs));
                     }
                 }
-
-            } else {
-                let validatedNodeAKs = validateAccessKeysFromNode(data.initiative.fields[i].access_key, nodeName);
-                if(validatedNodeAKs){
-                    init.fields.push(new Field(data.initiative.fields[i].property, validatedNodeAKs));
-                }
             }
+            initiativeData.push(init);
         }
-        initiativeData.push(init);
     }
-    console.log(initiativeData)
-    console.log(initiativeData[0].fields)
     return initiativeData;
+}
+
+const initiativeExists = (initiative) => {
+    return initiativeData.filter(x => x.initiative == initiative).length == 0;
 }
 
 const getAccessKeysFromNode = (classname) => {
@@ -89,15 +81,15 @@ const getAccessKeysFromNode = (classname) => {
 const validateAccessKeysFromNode = (accessKeys, node) => {
     let nodeAKs = getAccessKeysFromNode(node);
     let validatedNodeAKs = '';
-    if(accessKeys.includes(',')){
+    if (accessKeys.includes(',')) {
         const aks = accessKeys.split(',');
         aks.forEach(ak => {
-            if(nodeAKs.includes(ak)){
+            if (nodeAKs.includes(ak)) {
                 validatedNodeAKs += ak + ',';
             }
         });
-    }else{
-        if(nodeAKs.includes(accessKeys)){
+    } else {
+        if (nodeAKs.includes(accessKeys)) {
             validatedNodeAKs = accessKeys;
         }
     }

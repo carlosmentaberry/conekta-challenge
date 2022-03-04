@@ -17,8 +17,9 @@ app.use("/graphql", graphqlHTTP({
 }));
 
 
-// app.use("/api/users", userRoutes);
-// app.use("/api/initiatives", initiativeRoutes);
+app.get("/", (req, res) =>{
+    res.send("Hola!")
+});
 
 app.listen(PORT, () => {
     console.log(`app running on port ${PORT} process: ${process.pid}`);
