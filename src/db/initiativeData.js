@@ -57,7 +57,7 @@ const getInitiativeDB = async (data) => {
                         if(field.access_key.includes(key)){
                             obj[key] = true;
                         }else{
-                            obj[key] = true;
+                            obj[key] = false;
                         }
                     }
                     user[field.property] = obj;
