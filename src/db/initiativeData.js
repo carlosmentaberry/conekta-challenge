@@ -35,11 +35,11 @@ const getInitiativeDB = async (data) => {
         let initiative = new Initiative();
         initiative.initiative = data.initiative;
         initiative.fields = [];
+        let user = new User();
         init.fields.forEach(field => {
             
             let fi = getAccessKeysFromNode(getClassName(field.property));
             let obj = new constructors[getClassName(field.property)]();
-            let user = new User();
             
             for (const [key, value] of Object.entries(user)) {
                 user[key] = new constructors[getClassName(key)]();
