@@ -54,24 +54,20 @@ const saveInitiativeDB = async (data) => {
     if (data.initiative) {
         init.initiative = data.initiative.initiative;
         for (i = 0; i <= data.initiative.fields.length - 1; i++) {
+            let nodeName = getClassName(data.initiative.fields[i].property);
 
             if (!data.initiative.fields[i].access_key) {
-                init.fields.push(new Field(data.initiative.fields[i].property, []));
-
                 for (const [key, value] of Object.entries(new User())) {
                     if (key === data.initiative.fields[i].property) {
-                        let classname = data.initiative.fields[i].property.charAt(0).toUpperCase() + data.initiative.fields[i].property.slice(1);
-                        var obj = new constructors[classname]();
-                        let keys = '';
-                        for (const [key1, value1] of Object.entries(obj)) {
-                            keys += key1 + ',';
-                        }
-                        init.fields.push(new Field(data.initiative.fields[i].property, keys.split(',').filter(Boolean).join(',')));
+                        init.fields.push(new Field(data.initiative.fields[i].property, getAccessKeysFromNode(nodeName)));
                     }
                 }
 
             } else {
-                init.fields.push(new Field(data.initiative.fields[i].property, data.initiative.fields[i].access_key));
+                let validatedNodeAKs = validateAccessKeysFromNode(data.initiative.fields[i].access_key, nodeName);
+                if(validatedNodeAKs){
+                    init.fields.push(new Field(data.initiative.fields[i].property, validatedNodeAKs));
+                }
             }
         }
         initiativeData.push(init);
@@ -79,6 +75,38 @@ const saveInitiativeDB = async (data) => {
     console.log(initiativeData)
     console.log(initiativeData[0].fields)
     return initiativeData;
+}
+
+const getAccessKeysFromNode = (classname) => {
+    var obj = new constructors[classname]();
+    let keys = '';
+    for (const [key1, value1] of Object.entries(obj)) {
+        keys += key1 + ',';
+    }
+    return keys.split(',').filter(Boolean).join(',');
+}
+
+const validateAccessKeysFromNode = (accessKeys, node) => {
+    let nodeAKs = getAccessKeysFromNode(node);
+    let validatedNodeAKs = '';
+    if(accessKeys.includes(',')){
+        const aks = accessKeys.split(',');
+        aks.forEach(ak => {
+            if(nodeAKs.includes(ak)){
+                validatedNodeAKs += ak + ',';
+            }
+        });
+    }else{
+        if(nodeAKs.includes(accessKeys)){
+            validatedNodeAKs = accessKeys;
+        }
+    }
+
+    return validatedNodeAKs.split(',').filter(Boolean).join(',');
+}
+
+const getClassName = (propertyName) => {
+    return propertyName.charAt(0).toUpperCase() + propertyName.slice(1);
 }
 
 var constructors = {
