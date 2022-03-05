@@ -5,8 +5,6 @@ const PORT = process.env.PORT || 8080;
 
 const root = require("./src/services/rootService");
 const schema = require("./src/schemas/schema");
-// const userRoutes = require("./src/routes/userRoutes");
-// const initiativeRoutes = require("./src/routes/initiativeRoutes");
 
 app.use(express.json());
 

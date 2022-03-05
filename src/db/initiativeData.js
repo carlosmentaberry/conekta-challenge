@@ -18,21 +18,10 @@ const updateInitiativeDB = async (data, data2) => {
     return initiativeData.filter(x => x.initiative == data2.initiative)[0];
 }
 
-const deleteInitiativeDB = async (data) => {
-    let index = initiativeData.findIndex(x => x.initiative === data.initiative);
-    console.log(index);
-    if (index > -1) {
-        initiativeData.splice(index, 1);
-    }
-
-    return initiativeData;
-}
-
 module.exports = {
     initiativeData,
     getInitiativeDB,
     getInitiativesDB,
     saveInitiativeDB,
     updateInitiativeDB,
-    deleteInitiativeDB,
 }

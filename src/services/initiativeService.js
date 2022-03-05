@@ -62,13 +62,17 @@ const getInitiative = async (data) => {
                                 }
                             }
                             user[field.property] = obj;
-                        }else {
+                        } else {
                             for (const [key1, value1] of Object.entries(obj)) {
                                 if (field.access_key.includes(key1)) {
-                                    obj[key1] = true;
+                                    if(Object.entries(user[key]).filter(x => x[1])[0].filter(x => x == key1).length <= 0){
+                                        obj[key1] = true;
+                                    }else if (Object.entries(user[key]).filter(x => x[1])[0].filter(x => x == key1)) {
+                                        obj[key1] = user[key][key1];
+                                    }
                                 } else if (!Object.entries(user[key]).filter(x => x[1])[0].filter(x => x == key1)) {
                                     obj[key1] = false;
-                                }else if (Object.entries(user[key]).filter(x => x[1])[0].filter(x => x == key1)) {
+                                } else if (Object.entries(user[key]).filter(x => x[1])[0].filter(x => x == key1)) {
                                     obj[key1] = user[key][key1];
                                 }
                             }
@@ -151,7 +155,7 @@ const checkPermisions = (initiative) => {
                     field.access_key = validatedNodeAKs;
                 }
             }
-        }else{
+        } else {
             if (!field.access_key) {
                 field.access_key = getAccessKeysFromNode(field.property);
             } else {
@@ -162,7 +166,7 @@ const checkPermisions = (initiative) => {
             }
         }
     });
-   return initiative;
+    return initiative;
 }
 const deleteInitiative = async (data) => {
     await deleteInitiativeDB(data);
