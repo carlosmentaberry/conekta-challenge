@@ -1,102 +1,8 @@
-const { User, General_info, Comercial_info, Fiscal_info, Address } = require("../models/user");
-const { Initiative, Field } = require("../models/initiative");
-
-
-
 const initiativeData = [];
-//     {
-//         initiative: "risk",
-//         fields:
-//             [
-//                 {
-//                     property: "general_info",
-//                     access_key: "name, last_name, email"
-//                 },
-//                 {
-//                     property: "comercial_info",
-//                     access_key: "company_name, web"
-//                 },
-//                 {
-//                     property: "fisca_info",
-//                     access_key: "rfc, activity"
-//                 },
-//                 {
-//                     property: "fisca_info.address",
-//                     access_key: "street, number, zip_code"
-//                 }
-//             ]
-//     }
-// ];
-
 
 const getInitiativeDB = async (data) => {
-    let init = initiativeData.filter(x => x.initiative == data.initiative)[0];
-    if(init){
-        let initiative = new Initiative();
-        initiative.initiative = data.initiative;
-        initiative.fields = [];
-        let user = new User();
-        
-        for (const [key, value] of Object.entries(user)) {
-            let obj = new constructors[getClassName(key)]();
-            for (const [key, value] of Object.entries(obj)) {
-                obj[key] = false;
-            }
-            user[key] = obj;
-        }
-
-        init.fields.forEach(field => {
-            
-            // let fi = getAccessKeysFromNode(getClassName(field.property));
-
-            if(field.property.includes('.')){
-                let obj1 = new constructors[getClassName(field.property.split('.')[0])]();
-                let obj2 = new constructors[getClassName(field.property.split('.')[1])]();
-
-                for (const [key, value] of Object.entries(user)) {
-                    if(key == field.property.split('.')[0]){
-
-                        user[key] = new constructors[getClassName(key)]();
-                        user[key][field.property.split('.')[1]] = new constructors[getClassName(field.property.split('.')[1])]();
-                        for (const [key1, value1] of Object.entries(obj2)) {
-                            for (const [key2, value2] of Object.entries(obj1)) {
-                                obj1[key2] = false;
-                            }
-                            if(field.access_key.includes(key1)){
-                                obj2[key1] = true;
-                            }else{
-                                obj2[key1] = false;
-                            }
-                        }
-                        user[field.property.split('.')[0]] = obj1;
-                        console.log(user);
-                        console.log(user[field.property.split('.')[0]]);
-                        user[key][field.property.split('.')[1]] = obj2;
-                    }
-                }
-            }else{
-                let obj = new constructors[getClassName(field.property)]();
-
-                for (const [key, value] of Object.entries(user)) {
-                    if(key == field.property){
-                        user[key] = new constructors[getClassName(key)]();
-                        for (const [key, value] of Object.entries(obj)) {
-                            if(field.access_key.includes(key)){
-                                obj[key] = true;
-                            }else{
-                                obj[key] = false;
-                            }
-                        }
-                        user[field.property] = obj;
-                    }
-                }
-            }
-            
-        });
-        initiative.fields.push(user)
-        return initiative;
-    }
-
+    let asdf = initiativeData.filter(x => x.initiative === data.initiative)[0]
+    return asdf;
 }
 
 const getInitiativesDB = async () => {
@@ -104,99 +10,9 @@ const getInitiativesDB = async () => {
 }
 
 const saveInitiativeDB = async (data) => {
-    let init = new Initiative("", []);
-
-    if (data.initiative) {
-        if (initiativeExists(data.initiative.initiative)) {
-            init.initiative = data.initiative.initiative;
-            for (i = 0; i <= data.initiative.fields.length - 1; i++) {
-
-                if(data.initiative.fields[i].property.includes('.')){
-                    let nodeName = getClassName(data.initiative.fields[i].property.split('.')[1]);
-
-                    let obj1 = new constructors[getClassName(data.initiative.fields[i].property.split('.')[0])]();
-                    let obj2 = new constructors[getClassName(data.initiative.fields[i].property.split('.')[1])]();
-
-                    if (!data.initiative.fields[i].access_key) {
-                        for (const [key, value] of Object.entries(new User())) {
-                            if (key === data.initiative.fields[i].property.split('.')[0]) {
-                                // init.fields.push(new Field(data.initiative.fields[i].property.split('.')[0], getAccessKeysFromNode(nodeName)));
-                                init.fields.push(new Field(data.initiative.fields[i].property, getAccessKeysFromNode(nodeName)));
-                            }
-                        }
-                    } else {
-                        let validatedNodeAKs = validateAccessKeysFromNode(data.initiative.fields[i].access_key, nodeName);
-                        if (validatedNodeAKs) {
-                            init.fields.push(new Field(data.initiative.fields[i].property.split('.')[0], validatedNodeAKs));
-                        }
-                    }
-                }else{
-                    let nodeName = getClassName(data.initiative.fields[i].property);
-                    if (!data.initiative.fields[i].access_key) {
-                        for (const [key, value] of Object.entries(new User())) {
-                            if (key === data.initiative.fields[i].property) {
-                                init.fields.push(new Field(data.initiative.fields[i].property, getAccessKeysFromNode(nodeName)));
-                            }
-                        }
-                    } else {
-                        let validatedNodeAKs = validateAccessKeysFromNode(data.initiative.fields[i].access_key, nodeName);
-                        if (validatedNodeAKs) {
-                            init.fields.push(new Field(data.initiative.fields[i].property, validatedNodeAKs));
-                        }
-                    }
-                }
-
-
-            }
-            initiativeData.push(init);
-        }
-    }
-    return initiativeData;
+    initiativeData.push(data);
+    return (data);
 }
-
-const initiativeExists = (initiative) => {
-    return initiativeData.filter(x => x.initiative == initiative).length == 0;
-}
-
-const getAccessKeysFromNode = (classname) => {
-    let obj = new constructors[classname]();
-    let keys = '';
-    for (const [key1, value1] of Object.entries(obj)) {
-        keys += key1 + ',';
-    }
-    return keys.split(',').filter(Boolean).join(',');
-}
-
-const validateAccessKeysFromNode = (accessKeys, node) => {
-    let nodeAKs = getAccessKeysFromNode(node);
-    let validatedNodeAKs = '';
-    if (accessKeys.includes(',')) {
-        const aks = accessKeys.split(',');
-        aks.forEach(ak => {
-            if (nodeAKs.includes(ak)) {
-                validatedNodeAKs += ak + ',';
-            }
-        });
-    } else {
-        if (nodeAKs.includes(accessKeys)) {
-            validatedNodeAKs = accessKeys;
-        }
-    }
-
-    return validatedNodeAKs.split(',').filter(Boolean).join(',');
-}
-
-const getClassName = (propertyName) => {
-    return propertyName.charAt(0).toUpperCase() + propertyName.slice(1);
-}
-
-var constructors = {
-    User: User,
-    General_info: General_info,
-    Comercial_info: Comercial_info,
-    Fiscal_info: Fiscal_info,
-    Address: Address
-};
 
 const updateInitiativeDB = async (data) => {
     initiativeData.filter(x => x.initiative === data.initiative)[0].fields = data.fields;
@@ -214,6 +30,7 @@ const deleteInitiativeDB = async (data) => {
 }
 
 module.exports = {
+    initiativeData,
     getInitiativeDB,
     getInitiativesDB,
     saveInitiativeDB,

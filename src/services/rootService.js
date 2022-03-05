@@ -1,11 +1,17 @@
-const { getUserDB, getUsersDB, saveUserDB, deleteUserDB, updateUserDB } = require("../db/userData");
-const { getInitiativeDB, getInitiativesDB, saveInitiativeDB, updateInitiativeDB, deleteInitiativeDB } = require("../db/initiativeData");
+const { getUserDB, getUsersDB, saveUserDB, deleteUserDB, updateUserDB } = require("../services/userService");
+const {
+    getInitiative,
+    getInitiatives,
+    createInitiative,
+    updateInitiative,
+    deleteInitiative
+} = require("../services/initiativeService");
 
 module.exports = root = {
     getUsers: () => {
         return getUsersDB();
     },
-    
+
     getUser: (data) => {
         return getUserDB(data);
     },
@@ -18,21 +24,21 @@ module.exports = root = {
     deleteUser: (data) => {
         return deleteUserDB(data);
     },
-    
+
     getInitiatives: () => {
-        return getInitiativesDB();
+        return getInitiatives();
     },
-    
+
     getInitiative: (data) => {
-        return getInitiativeDB(data);
+        return getInitiative(data);
     },
     createInitiative: (data) => {
-        return saveInitiativeDB(data);
+        return createInitiative(data);
     },
     updateInitiative: (data) => {
-        return updateInitiativeDB(data);
+        return updateInitiative(data);
     },
     deleteInitiative: (data) => {
-        return deleteInitiativeDB(data);
+        return deleteInitiative(data);
     },
 }

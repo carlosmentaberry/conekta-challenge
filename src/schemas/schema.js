@@ -63,7 +63,7 @@ module.exports = schema = buildSchema(`
         updateUser(name:String, last_name:String) : User
         deleteUser(name:String, last_name:String) : User
 
-        createInitiative(initiative:InitiativeInput) : [Initiative]
+        createInitiative(initiative:InitiativeInput) : Initiative
         updateInitiative(initiative:InitiativeInput) : [Initiative]
         deleteInitiative(initiative:InitiativeInput) : [Initiative]
 
