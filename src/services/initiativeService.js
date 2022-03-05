@@ -134,8 +134,8 @@ const createInitiative = async (data) => {
 }
 
 const updateInitiative = async (data) => {
-    await updateInitiativeDB(data);
-    return data;
+    let init = await getInitiative(data.initiative);
+    return await updateInitiativeDB(init, data.initiative);
 }
 
 const deleteInitiative = async (data) => {

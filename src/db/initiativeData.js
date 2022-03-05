@@ -1,8 +1,7 @@
 const initiativeData = [];
 
 const getInitiativeDB = async (data) => {
-    let asdf = initiativeData.filter(x => x.initiative === data.initiative)[0]
-    return asdf;
+    return initiativeData.filter(x => x.initiative == data.initiative)[0];
 }
 
 const getInitiativesDB = async () => {
@@ -14,9 +13,9 @@ const saveInitiativeDB = async (data) => {
     return (data);
 }
 
-const updateInitiativeDB = async (data) => {
-    initiativeData.filter(x => x.initiative === data.initiative)[0].fields = data.fields;
-    return initiativeData;
+const updateInitiativeDB = async (data, data2) => {
+    initiativeData.filter(x => x.initiative == data2.initiative)[0].fields = data2.fields;
+    return initiativeData.filter(x => x.initiative == data2.initiative)[0];
 }
 
 const deleteInitiativeDB = async (data) => {
