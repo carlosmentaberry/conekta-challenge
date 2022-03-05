@@ -1,13 +1,14 @@
-const { getInitiativeDB, getInitiativesDB, saveInitiativeDB, updateInitiativeDB, deleteInitiativeDB, initiativeData } = require("../db/initiativeData")
-const { User, General_info, Comercial_info, Fiscal_info, Address } = require("../models/user");
+const {  initiativeData } = require("../db/initiativeData")
+const { User } = require("../models/user");
 const { Initiative, Field } = require("../models/initiative");
+const { getClassName, constructors, fixCSV } = require("../utils/objectUtils")
 
-const { userDao, initiativeDao } = require('../daos/index');
+const { initiativeDao } = require('../daos/index');
 
 
 const getInitiative = async (data) => {
-    
-    let init = await initiativeDao.listar('initiative', data.initiative);
+
+    let init = await initiativeDao.listObject('initiative', data.initiative);
 
     if (init) {
         let initiative = new Initiative();
@@ -70,9 +71,9 @@ const getInitiative = async (data) => {
                         } else {
                             for (const [key1, value1] of Object.entries(obj)) {
                                 if (field.access_key.includes(key1)) {
-                                    if(Object.entries(user[key]).filter(x => x[1])[0].filter(x => x == key1).length <= 0){
+                                    if (Object.entries(user[key]).filter(x => x[1])[0].filter(x => x == key1).length <= 0) {
                                         obj[key1] = true;
-                                    }else if (Object.entries(user[key]).filter(x => x[1])[0].filter(x => x == key1)) {
+                                    } else if (Object.entries(user[key]).filter(x => x[1])[0].filter(x => x == key1)) {
                                         obj[key1] = user[key][key1];
                                     }
                                 } else if (!Object.entries(user[key]).filter(x => x[1])[0].filter(x => x == key1)) {
@@ -93,7 +94,7 @@ const getInitiative = async (data) => {
 }
 
 const getInitiatives = async () => {
-    return await initiativeDao.listarAll();
+    return await initiativeDao.listAll();
 }
 
 const createInitiative = async (data) => {
@@ -101,7 +102,8 @@ const createInitiative = async (data) => {
     let init = new Initiative("", []);
 
     if (data.initiative) {
-        if (initiativeExists(data.initiative.initiative)) {
+        let ie = await initiativeExists(data.initiative.initiative);
+        if (!ie) {
             init.initiative = data.initiative.initiative;
             for (i = 0; i <= data.initiative.fields.length - 1; i++) {
 
@@ -136,19 +138,17 @@ const createInitiative = async (data) => {
                     }
                 }
             }
+            return await initiativeDao.save(init);
         }
     }
-    await initiativeDao.guardar(init);
     return init;
 }
 
 const updateInitiative = async (data) => {
-    let init = await getInitiative(data.initiative);
+    // let init = await getInitiative(data.initiative);
     data.initiative = checkPermisions(data.initiative)
 
-    // let asdf = await updateInitiativeDB(init, data.initiative);
-    let qwer = await initiativeDao.actualizar('initiative', data.initiative.initiative, data.initiative);
-    return qwer;
+    return await initiativeDao.update('initiative', data.initiative.initiative, data.initiative);
 }
 
 const checkPermisions = (initiative) => {
@@ -183,10 +183,10 @@ const deleteInitiative = async (data) => {
 const getAccessKeysFromNode = (classname) => {
     let obj = new constructors[getClassName(classname)]();
     let keys = '';
-    for (const [key1, value1] of Object.entries(obj)) {
-        keys += key1 + ',';
+    for (const [key, value] of Object.entries(obj)) {
+        keys += key + ',';
     }
-    return keys.split(',').filter(Boolean).join(',');
+    return fixCSV(keys);
 }
 
 const validateAccessKeysFromNode = (accessKeys, node) => {
@@ -205,24 +205,18 @@ const validateAccessKeysFromNode = (accessKeys, node) => {
         }
     }
 
-    return validatedNodeAKs.split(',').filter(Boolean).join(',');
+    return fixCSV(validatedNodeAKs);
 }
 
-const getClassName = (propertyName) => {
-    return propertyName.charAt(0).toUpperCase() + propertyName.slice(1);
+const initiativeExists = async (initiative) => {
+    let init
+    try {
+        init = await initiativeDao.listObject('initiative', initiative);
+    } catch (error) {
+        return false;
+    }
+    return true;
 }
-
-const initiativeExists = (initiative) => {
-    return initiativeData.filter(x => x.initiative == initiative).length == 0;
-}
-
-const constructors = {
-    User: User,
-    General_info: General_info,
-    Comercial_info: Comercial_info,
-    Fiscal_info: Fiscal_info,
-    Address: Address
-};
 
 module.exports = {
     constructors,

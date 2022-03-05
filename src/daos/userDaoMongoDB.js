@@ -8,8 +8,8 @@ class UserDaoMongoDb extends ContenedorMongoDb {
         })
     }
 
-    async guardar(user = { users: [] }) {
-        return super.guardar(user)
+    async save(user = { users: [] }) {
+        return super.save(user)
     }
 }
 

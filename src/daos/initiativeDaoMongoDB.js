@@ -15,8 +15,8 @@ class InitiativeDaoMongoDb extends ContenedorMongoDb {
         })
     }
 
-    async guardar(initiative = { initiatives: [] }) {
-        return super.guardar(initiative)
+    async save(initiative = { initiatives: [] }) {
+        return super.save(initiative)
     }
 }
 

@@ -10,105 +10,108 @@ class ContenedorMongoDb {
         this.coleccion = mongoose.model(nombreColeccion, esquema)
     }
 
-    async listar(id) {
+    async listObject(id) {
         try {
-            const docs = await this.coleccion.find({ '_id': id }, { __v: 0 })
+            const docs = await this.coleccion.find({ '_id': id }, { __v: 0 });
             if (docs.length == 0) {
-                throw new Error('Error al listar por id: no encontrado')
+                throw new Error('Error listing object, id not found');
             } else {
-                const result = renameField(asPOJO(docs[0]), '_id', 'id')
-                return result
+                const result = renameField(asPOJO(docs[0]), '_id', 'id');
+                return result;
             }
         } catch (error) {
-            throw new Error(`Error al listar por id: ${error}`)
+            throw new Error(`Error listing object by id: ${error}`);
         }
     }
 
-    async listar(param, value) {
+    async listObject(param, value) {
         try {
-            const docs = await this.coleccion.find({ param: value }, { __v: 0 })
+            const docs = await this.coleccion.find({ param: value }, { __v: 0 });
             if (docs.length == 0) {
-                throw new Error('Error al listar por id: no encontrado')
+                throw new Error(`Error listing object by ${param}: object not found`);
             } else {
-                const result = renameField(asPOJO(docs[0]), '_id', 'id')
-                return result
+                const result = renameField(asPOJO(docs[0]), '_id', 'id');
+                return result;
             }
         } catch (error) {
-            throw new Error(`Error al listar por id: ${error}`)
+            throw new Error(`Error listing object by ${param}:  ${error}`);
         }
     }
 
-    async listarAll() {
+    async listAll() {
         try {
-            let docs = await this.coleccion.find({}, { __v: 0 }).lean()
-            docs = docs.map(asPOJO)
-            docs = docs.map(d => renameField(d, '_id', 'id'))
-            return docs
+            let docs = await this.coleccion.find({}, { __v: 0 }).lean();
+            docs = docs.map(asPOJO);
+            docs = docs.map(d => renameField(d, '_id', 'id'));
+            return docs;
         } catch (error) {
-            throw new Error(`Error al listar todo: ${error}`)
+            throw new Error(`Error listing all ojbects: ${error}`);
         }
     }
 
-    async guardar(nuevoElem) {
+    async save(nuevoElem) {
         try {
             let doc = await this.coleccion.create(nuevoElem);
-            doc = asPOJO(doc)
-            renameField(doc, '_id', 'id')
-            removeField(doc, '__v')
-            return doc
+            doc = asPOJO(doc);
+            renameField(doc, '_id', 'id');
+            removeField(doc, '__v');
+            return doc;
         } catch (error) {
-            throw new Error(`Error al guardar: ${error}`)
+            throw new Error(`Error saving object: ${error}`);
         }
     }
 
-    async actualizar(nuevoElem) {
+    async update(nuevoElem) {
         try {
-            renameField(nuevoElem, 'id', '_id')
-            const { n, nModified } = await this.coleccion.replaceOne({ '_id': nuevoElem._id }, nuevoElem)
+            const { n, nModified } = await this.coleccion.replaceOne({ '_id': nuevoElem._id }, nuevoElem);
             if (n == 0 || nModified == 0) {
-                throw new Error('Error al actualizar: no encontrado')
+                throw new Error('Error updating object by id: object not found');
             } else {
-                renameField(nuevoElem, '_id', 'id')
-                removeField(nuevoElem, '__v')
-                return asPOJO(nuevoElem)
+                renameField(nuevoElem, '_id', 'id');
+                removeField(nuevoElem, '__v');
+                return asPOJO(nuevoElem);
             }
         } catch (error) {
-            throw new Error(`Error al actualizar: ${error}`)
+            throw new Error(`Error updating object: ${error}`);
         }
     }
 
-    async actualizar(param, value, nuevoElem) {
+    async update(param, value, nuevoElem) {
         try {
-            let obj = await this.listar(param, value);
-            const { n, nModified } = await this.coleccion.replaceOne({ '_id': obj.id }, nuevoElem)
-            if (n == 0 || nModified == 0) {
-                throw new Error('Error al actualizar: no encontrado')
+            let obj = await this.listObject(param, value);
+            if (obj) {
+                const { n, nModified } = await this.coleccion.replaceOne({ '_id': obj.id }, nuevoElem);
+                if (n == 0 || nModified == 0) {
+                    throw new Error(`Error updating object by ${param}: object not found`);
+                } else {
+                    renameField(nuevoElem, '_id', 'id');
+                    removeField(nuevoElem, '__v');
+                    return asPOJO(nuevoElem);
+                }
             } else {
-                renameField(nuevoElem, '_id', 'id')
-                removeField(nuevoElem, '__v')
-                return asPOJO(nuevoElem)
+                throw new Error(`Error updating object by ${param}: object not found`);
             }
         } catch (error) {
-            throw new Error(`Error al actualizar: ${error}`)
+            throw new Error(`Error updating object by ${param}:  ${error}`);
         }
     }
 
-    async borrar(id) {
+    async delete(id) {
         try {
-            const { n, nDeleted } = await this.coleccion.deleteOne({ '_id': id })
+            const { n, nDeleted } = await this.coleccion.deleteOne({ '_id': id });
             if (n == 0 || nDeleted == 0) {
-                throw new Error('Error al borrar: no encontrado')
+                throw new Error(`Error deleting object by id: object not found`);
             }
         } catch (error) {
-            throw new Error(`Error al borrar: ${error}`)
+            throw new Error(`Error deleting object: ${error}`);
         }
     }
 
-    async borrarAll() {
+    async deleteAll() {
         try {
-            await this.coleccion.deleteMany({})
+            await this.coleccion.deleteMany({});
         } catch (error) {
-            throw new Error(`Error al borrar: ${error}`)
+            throw new Error(`Error deleting all objects: ${error}`);
         }
     }
 }
