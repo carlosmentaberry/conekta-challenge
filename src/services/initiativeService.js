@@ -135,16 +135,42 @@ const createInitiative = async (data) => {
 
 const updateInitiative = async (data) => {
     let init = await getInitiative(data.initiative);
+    data.initiative = checkPermisions(data.initiative)
+
     return await updateInitiativeDB(init, data.initiative);
 }
 
+const checkPermisions = (initiative) => {
+    initiative.fields.forEach(field => {
+        if (field.property.includes('.')) {
+            if (!field.access_key) {
+                field.access_key = getAccessKeysFromNode(field.property.split('.')[1]);
+            } else {
+                let validatedNodeAKs = validateAccessKeysFromNode(field.access_key, field.property.split('.')[1]);
+                if (validatedNodeAKs) {
+                    field.access_key = validatedNodeAKs;
+                }
+            }
+        }else{
+            if (!field.access_key) {
+                field.access_key = getAccessKeysFromNode(field.property);
+            } else {
+                let validatedNodeAKs = validateAccessKeysFromNode(field.access_key, field.property);
+                if (validatedNodeAKs) {
+                    field.access_key = validatedNodeAKs;
+                }
+            }
+        }
+    });
+   return initiative;
+}
 const deleteInitiative = async (data) => {
     await deleteInitiativeDB(data);
     return data;
 }
 
 const getAccessKeysFromNode = (classname) => {
-    let obj = new constructors[classname]();
+    let obj = new constructors[getClassName(classname)]();
     let keys = '';
     for (const [key1, value1] of Object.entries(obj)) {
         keys += key1 + ',';
