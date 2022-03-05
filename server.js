@@ -7,6 +7,7 @@ const root = require("./src/services/rootService");
 const schema = require("./src/schemas/schema");
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }))
 
 app.use("/graphql", graphqlHTTP({
     schema: schema,
@@ -22,5 +23,6 @@ app.get("/", (req, res) =>{
 app.listen(PORT, () => {
     console.log(`app running on port ${PORT} process: ${process.pid}`);
 });
+app.on('error', error => console.log(`Server error: ${error}`))
 
 module.exports = app;

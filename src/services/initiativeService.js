@@ -2,8 +2,13 @@ const { getInitiativeDB, getInitiativesDB, saveInitiativeDB, updateInitiativeDB,
 const { User, General_info, Comercial_info, Fiscal_info, Address } = require("../models/user");
 const { Initiative, Field } = require("../models/initiative");
 
+const { userDao, initiativeDao } = require('../daos/index');
+
+
 const getInitiative = async (data) => {
-    let init = await getInitiativeDB(data);
+    
+    let init = await initiativeDao.listar('initiative', data.initiative);
+
     if (init) {
         let initiative = new Initiative();
         initiative.initiative = data.initiative;
@@ -88,7 +93,7 @@ const getInitiative = async (data) => {
 }
 
 const getInitiatives = async () => {
-    return await getInitiativesDB();
+    return await initiativeDao.listarAll();
 }
 
 const createInitiative = async (data) => {
@@ -133,7 +138,7 @@ const createInitiative = async (data) => {
             }
         }
     }
-    await saveInitiativeDB(init);
+    await initiativeDao.guardar(init);
     return init;
 }
 
@@ -141,7 +146,9 @@ const updateInitiative = async (data) => {
     let init = await getInitiative(data.initiative);
     data.initiative = checkPermisions(data.initiative)
 
-    return await updateInitiativeDB(init, data.initiative);
+    // let asdf = await updateInitiativeDB(init, data.initiative);
+    let qwer = await initiativeDao.actualizar('initiative', data.initiative.initiative, data.initiative);
+    return qwer;
 }
 
 const checkPermisions = (initiative) => {
