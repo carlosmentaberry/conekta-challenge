@@ -1,17 +1,21 @@
-const {  initiativeData } = require("../db/initiativeData")
+const { initiativeData } = require("../db/initiativeData")
 const { User } = require("../models/user");
 const { Initiative, Field } = require("../models/initiative");
 const { getClassName, constructors, fixCSV } = require("../utils/objectUtils")
-
 const { initiativeDao } = require('../daos/index');
 
 
 const getInitiative = async (data) => {
-
-    let init = await initiativeDao.listObject('initiative', data.initiative);
+    let initiative = new Initiative();
+    let init;
+    
+    try {
+        init = await initiativeDao.listObject('initiative', data.initiative);
+    } catch (error) {
+        return initiative;
+    }
 
     if (init) {
-        let initiative = new Initiative();
         initiative.initiative = data.initiative;
         initiative.fields = [];
         let user = new User();
@@ -25,29 +29,28 @@ const getInitiative = async (data) => {
         }
 
         init.fields.forEach(field => {
-
             if (field.property.includes('.')) {
-                let obj1 = new constructors[getClassName(field.property.split('.')[0])]();
-                let obj2 = new constructors[getClassName(field.property.split('.')[1])]();
+                let obj = new constructors[getClassName(field.property.split('.')[0])]();
+                let nestedObj = new constructors[getClassName(field.property.split('.')[1])]();
 
                 for (const [key, value] of Object.entries(user)) {
                     if (key == field.property.split('.')[0]) {
 
                         user[key] = new constructors[getClassName(key)]();
                         user[key][field.property.split('.')[1]] = new constructors[getClassName(field.property.split('.')[1])]();
-                        for (const [key2, value2] of Object.entries(obj1)) {
-                            obj1[key2] = false;
+                        for (const [key1, value1] of Object.entries(obj)) {
+                            obj[key1] = false;
                         }
-                        for (const [key1, value1] of Object.entries(obj2)) {
+                        for (const [key1, value1] of Object.entries(nestedObj)) {
 
                             if (field.access_key.includes(key1)) {
-                                obj2[key1] = true;
+                                nestedObj[key1] = true;
                             } else {
-                                obj2[key1] = false;
+                                nestedObj[key1] = false;
                             }
                         }
-                        user[field.property.split('.')[0]] = obj1;
-                        user[key][field.property.split('.')[1]] = obj2;
+                        user[field.property.split('.')[0]] = obj;
+                        user[key][field.property.split('.')[1]] = nestedObj;
                     }
                 }
             } else {
@@ -145,7 +148,6 @@ const createInitiative = async (data) => {
 }
 
 const updateInitiative = async (data) => {
-    // let init = await getInitiative(data.initiative);
     data.initiative = checkPermisions(data.initiative)
 
     return await initiativeDao.update('initiative', data.initiative.initiative, data.initiative);
@@ -190,22 +192,22 @@ const getAccessKeysFromNode = (classname) => {
 }
 
 const validateAccessKeysFromNode = (accessKeys, node) => {
-    let nodeAKs = getAccessKeysFromNode(node);
-    let validatedNodeAKs = '';
+    let nodeAccessKeys = getAccessKeysFromNode(node);
+    let validatedNodeAccessKeys = '';
     if (accessKeys.includes(',')) {
-        const aks = accessKeys.split(',');
-        aks.forEach(ak => {
-            if (nodeAKs.includes(ak)) {
-                validatedNodeAKs += ak + ',';
+        const accesskeys = accessKeys.split(',');
+        accesskeys.forEach(ak => {
+            if (nodeAccessKeys.includes(ak)) {
+                validatedNodeAccessKeys += ak + ',';
             }
         });
     } else {
-        if (nodeAKs.includes(accessKeys)) {
-            validatedNodeAKs = accessKeys;
+        if (nodeAccessKeys.includes(accessKeys)) {
+            validatedNodeAccessKeys = accessKeys;
         }
     }
 
-    return fixCSV(validatedNodeAKs);
+    return fixCSV(validatedNodeAccessKeys);
 }
 
 const initiativeExists = async (initiative) => {

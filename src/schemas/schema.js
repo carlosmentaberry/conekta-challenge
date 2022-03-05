@@ -51,9 +51,6 @@ module.exports = schema = buildSchema(`
     }
     
     type Query {
-        getUsers : [User]
-        getUser(name:String) : User
-
         getInitiatives: [Initiative]
         getInitiative(initiative:String) : InitiativeOutPut
     }

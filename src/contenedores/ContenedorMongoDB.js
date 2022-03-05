@@ -26,11 +26,11 @@ class ContenedorMongoDb {
 
     async listObject(param, value) {
         try {
-            const docs = await this.coleccion.find({ param: value }, { __v: 0 });
+            const docs = await this.coleccion.findOne({ 'initiative': value }, { __v: 0 });
             if (docs.length == 0) {
                 throw new Error(`Error listing object by ${param}: object not found`);
             } else {
-                const result = renameField(asPOJO(docs[0]), '_id', 'id');
+                const result = renameField(asPOJO(docs._doc), '_id', 'id');
                 return result;
             }
         } catch (error) {
@@ -49,9 +49,9 @@ class ContenedorMongoDb {
         }
     }
 
-    async save(nuevoElem) {
+    async save(newElement) {
         try {
-            let doc = await this.coleccion.create(nuevoElem);
+            let doc = await this.coleccion.create(newElement);
             doc = asPOJO(doc);
             renameField(doc, '_id', 'id');
             removeField(doc, '__v');
@@ -61,32 +61,32 @@ class ContenedorMongoDb {
         }
     }
 
-    async update(nuevoElem) {
+    async update(newElement) {
         try {
-            const { n, nModified } = await this.coleccion.replaceOne({ '_id': nuevoElem._id }, nuevoElem);
+            const { n, nModified } = await this.coleccion.replaceOne({ '_id': newElement._id }, newElement);
             if (n == 0 || nModified == 0) {
                 throw new Error('Error updating object by id: object not found');
             } else {
-                renameField(nuevoElem, '_id', 'id');
-                removeField(nuevoElem, '__v');
-                return asPOJO(nuevoElem);
+                renameField(newElement, '_id', 'id');
+                removeField(newElement, '__v');
+                return asPOJO(newElement);
             }
         } catch (error) {
             throw new Error(`Error updating object: ${error}`);
         }
     }
 
-    async update(param, value, nuevoElem) {
+    async update(param, value, newElement) {
         try {
             let obj = await this.listObject(param, value);
             if (obj) {
-                const { n, nModified } = await this.coleccion.replaceOne({ '_id': obj.id }, nuevoElem);
+                const { n, nModified } = await this.coleccion.replaceOne({ '_id': obj.id }, newElement);
                 if (n == 0 || nModified == 0) {
                     throw new Error(`Error updating object by ${param}: object not found`);
                 } else {
-                    renameField(nuevoElem, '_id', 'id');
-                    removeField(nuevoElem, '__v');
-                    return asPOJO(nuevoElem);
+                    renameField(newElement, '_id', 'id');
+                    removeField(newElement, '__v');
+                    return asPOJO(newElement);
                 }
             } else {
                 throw new Error(`Error updating object by ${param}: object not found`);
