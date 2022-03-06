@@ -156,6 +156,10 @@ const updateInitiative = async (data) => {
     return await initiativeDao.update('initiative', data.initiative.initiative, data.initiative);
 }
 
+const deleteInitiative = async (data) => {
+    return await initiativeDao.delete('initiative', data.initiative.initiative);
+}
+
 
 const initiativeExists = async (initiative) => {
     let init
@@ -173,5 +177,6 @@ module.exports = {
     getInitiatives,
     createInitiative,
     updateInitiative,
+    deleteInitiative,
     initiativeExists
 }

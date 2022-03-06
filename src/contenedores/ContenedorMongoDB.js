@@ -107,6 +107,23 @@ class ContenedorMongoDb {
         }
     }
 
+    async delete(param, value) {
+        try {
+            let obj = await this.listObject(param, value);
+            if (obj) {
+                const { n, nDeleted } = await this.coleccion.deleteOne({ '_id': obj.id });
+            if (n == 0 || nDeleted == 0) {
+                throw new Error(`Error deleting object by id: object not found`);
+            }
+            } else {
+                throw new Error(`Error deleting object: ${error}: object not found`);
+            }
+        } catch (error) {
+            throw new Error(`Error deleting object: ${error}`);
+        }
+        return `Object ${param} : ${value} deleted successfully`;
+    }
+
     async deleteAll() {
         try {
             await this.coleccion.deleteMany({});

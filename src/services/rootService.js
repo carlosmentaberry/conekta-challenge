@@ -3,6 +3,7 @@ const {
     getInitiatives,
     createInitiative,
     updateInitiative,
+    deleteInitiative
 } = require("../services/initiativeService");
 
 module.exports = root = {
@@ -18,5 +19,8 @@ module.exports = root = {
     },
     updateInitiative: (data) => {
         return updateInitiative(data);
+    },
+    deleteInitiative: (data) => {
+        return deleteInitiative(data);
     },
 }

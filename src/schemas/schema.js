@@ -58,6 +58,7 @@ module.exports = schema = buildSchema(`
     type Mutation {
         createInitiative(initiative:InitiativeInput) : Initiative
         updateInitiative(initiative:InitiativeInput) : Initiative
+        deleteInitiative(initiative:InitiativeInput) : String
     }
 
     input FieldInput {

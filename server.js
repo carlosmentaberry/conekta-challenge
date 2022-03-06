@@ -16,7 +16,7 @@ app.use("/graphql", graphqlHTTP({
 
 
 app.get("/", (req, res) =>{
-    res.send("Hola!")
+    res.send("Challenge - Conekta. Carlos Mentaberry!")
 });
 
 app.listen(PORT, () => {
