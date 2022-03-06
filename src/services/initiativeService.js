@@ -58,7 +58,6 @@ const getInitiative = async (data) => {
 
                 for (const [key, value] of Object.entries(user)) {
                     if (key == field.property) {
-                        console.log(Object.entries(user[key]).filter(x => x[1]));
                         if (
                             Object.entries(user[key]).filter(x => x[1]).length < 1
                         ) {
@@ -92,6 +91,7 @@ const getInitiative = async (data) => {
             }
         });
         initiative.fields.push(user);
+        console.log(initiative);
         return initiative;
     }
 }

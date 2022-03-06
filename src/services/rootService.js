@@ -1,4 +1,3 @@
-const { getUserDB, getUsersDB } = require("../services/userService");
 const {
     getInitiative,
     getInitiatives,
@@ -7,13 +6,6 @@ const {
 } = require("../services/initiativeService");
 
 module.exports = root = {
-    getUsers: () => {
-        return getUsersDB();
-    },
-
-    getUser: (data) => {
-        return getUserDB(data);
-    },
     getInitiatives: () => {
         return getInitiatives();
     },

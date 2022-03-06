@@ -7,7 +7,7 @@ class InitiativeDaoMongoDb extends ContenedorMongoDb {
         super('initiatives', {
             initiative: { type: String, required: true },
             fields: [
-                { 
+                {
                     property: { type: String, required: true },
                     access_key: { type: String, required: false },
                 }
