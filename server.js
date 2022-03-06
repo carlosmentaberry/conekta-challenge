@@ -7,7 +7,6 @@ const root = require("./src/services/rootService");
 const schema = require("./src/schemas/schema");
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
 
 app.use("/graphql", graphqlHTTP({
     schema: schema,
