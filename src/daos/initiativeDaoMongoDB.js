@@ -1,4 +1,4 @@
-const ContenedorMongoDb = require("../contenedores/ContenedorMongoDb.js");
+const ContenedorMongoDb = require("../contenedores/ContenedorMongoDb");
 
 class InitiativeDaoMongoDb extends ContenedorMongoDb {
 
