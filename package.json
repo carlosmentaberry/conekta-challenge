@@ -1,14 +1,14 @@
 {
   "name": "challenge",
   "version": "1.0.0",
-  "description": "",
+  "description": "Challenge Conekta",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "test": "mocha test/**/*.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Carlos Mentaberry",
   "license": "ISC",
   "devDependencies": {
     "@faker-js/faker": "^6.0.0-alpha.7",

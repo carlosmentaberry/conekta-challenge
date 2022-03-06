@@ -1,5 +1,4 @@
 const ContenedorMongoDb = require("../contenedores/ContenedorMongoDb.js");
-const { Field } = require("../models/initiative.js");
 
 class InitiativeDaoMongoDb extends ContenedorMongoDb {
 

@@ -1,14 +1,22 @@
-const { initiativeData } = require("../db/initiativeData")
 const { User } = require("../models/user");
 const { Initiative, Field } = require("../models/initiative");
-const { getClassName, constructors, fixCSV } = require("../utils/objectUtils")
+const { 
+    getClassName,
+    constructors,
+    checkPermisions,
+    getAccessKeysFromNode,
+    validateAccessKeysFromNode } = require("../utils/objectUtils")
 const { initiativeDao } = require('../daos/index');
 
+
+const getInitiatives = async () => {
+    return await initiativeDao.listAll();
+}
 
 const getInitiative = async (data) => {
     let initiative = new Initiative();
     let init;
-    
+
     try {
         init = await initiativeDao.listObject('initiative', data.initiative);
     } catch (error) {
@@ -91,13 +99,8 @@ const getInitiative = async (data) => {
             }
         });
         initiative.fields.push(user);
-        console.log(initiative);
         return initiative;
     }
-}
-
-const getInitiatives = async () => {
-    return await initiativeDao.listAll();
 }
 
 const createInitiative = async (data) => {
@@ -153,62 +156,6 @@ const updateInitiative = async (data) => {
     return await initiativeDao.update('initiative', data.initiative.initiative, data.initiative);
 }
 
-const checkPermisions = (initiative) => {
-    initiative.fields.forEach(field => {
-        if (field.property.includes('.')) {
-            if (!field.access_key) {
-                field.access_key = getAccessKeysFromNode(field.property.split('.')[1]);
-            } else {
-                let validatedNodeAKs = validateAccessKeysFromNode(field.access_key, field.property.split('.')[1]);
-                if (validatedNodeAKs) {
-                    field.access_key = validatedNodeAKs;
-                }
-            }
-        } else {
-            if (!field.access_key) {
-                field.access_key = getAccessKeysFromNode(field.property);
-            } else {
-                let validatedNodeAKs = validateAccessKeysFromNode(field.access_key, field.property);
-                if (validatedNodeAKs) {
-                    field.access_key = validatedNodeAKs;
-                }
-            }
-        }
-    });
-    return initiative;
-}
-const deleteInitiative = async (data) => {
-    await deleteInitiativeDB(data);
-    return data;
-}
-
-const getAccessKeysFromNode = (classname) => {
-    let obj = new constructors[getClassName(classname)]();
-    let keys = '';
-    for (const [key, value] of Object.entries(obj)) {
-        keys += key + ',';
-    }
-    return fixCSV(keys);
-}
-
-const validateAccessKeysFromNode = (accessKeys, node) => {
-    let nodeAccessKeys = getAccessKeysFromNode(node);
-    let validatedNodeAccessKeys = '';
-    if (accessKeys.includes(',')) {
-        const accesskeys = accessKeys.split(',');
-        accesskeys.forEach(ak => {
-            if (nodeAccessKeys.includes(ak)) {
-                validatedNodeAccessKeys += ak + ',';
-            }
-        });
-    } else {
-        if (nodeAccessKeys.includes(accessKeys)) {
-            validatedNodeAccessKeys = accessKeys;
-        }
-    }
-
-    return fixCSV(validatedNodeAccessKeys);
-}
 
 const initiativeExists = async (initiative) => {
     let init
@@ -220,11 +167,11 @@ const initiativeExists = async (initiative) => {
     return true;
 }
 
+
 module.exports = {
-    constructors,
     getInitiative,
     getInitiatives,
     createInitiative,
     updateInitiative,
-    deleteInitiative
+    initiativeExists
 }
